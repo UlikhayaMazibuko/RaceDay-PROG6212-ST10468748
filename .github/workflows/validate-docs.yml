@@ -1,0 +1,120 @@
+# Validates that the Part 1 planning deliverables are present and that the SQL
+# script actually contains what the brief asks for. Runs on every push and pull
+# request so the repository cannot drift out of shape without the build going red.
+
+name: Validate Part 1 Documentation
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+  workflow_dispatch:
+
+jobs:
+  validate-structure:
+    name: Check /docs contents
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      # The /docs folder is where the brief requires all three planning
+      # deliverables to live. If it is missing there is no point continuing.
+      - name: Confirm the docs folder exists
+        run: |
+          if [ ! -d "docs" ]; then
+            echo "::error::The /docs folder is missing from the repository root."
+            exit 1
+          fi
+          echo "Found /docs containing:"
+          ls -1 docs
+
+      # The ERD may be submitted as PNG or PDF, so accept either rather than
+      # forcing one filename.
+      - name: Confirm the ERD is present
+        run: |
+          # ls returns a failure code if any one glob has no match, even when
+          # another does, so pipe through grep and test for any output instead.
+          if ! ls docs/*.pdf docs/*.png 2>/dev/null | grep -q .; then
+            echo "::error::No ERD found in /docs. Expected a .pdf or .png file."
+            exit 1
+          fi
+          echo "ERD present."
+
+      # The endpoint plan is accepted as PDF or Markdown.
+      - name: Confirm the API endpoint plan is present
+        run: |
+          if ! ls docs/*[Ee]ndpoint*.pdf docs/*[Ee]ndpoint*.md docs/*[Ee]ndpoint*.docx 2>/dev/null | grep -q .; then
+            echo "::error::No API endpoint plan found in /docs."
+            exit 1
+          fi
+          echo "Endpoint plan present."
+
+      - name: Confirm the SQL script is present
+        run: |
+          if ! ls docs/*.sql >/dev/null 2>&1; then
+            echo "::error::No .sql script found in /docs."
+            exit 1
+          fi
+          echo "SQL script present."
+
+      # A file being present is not the same as it being complete. These checks
+      # confirm the script actually creates all seven entities from the ERD and
+      # seeds them, which is what the rubric is really asking for.
+      - name: Check the SQL script creates every table in the ERD
+        run: |
+          SCRIPT=$(ls docs/*.sql | head -n 1)
+          MISSING=0
+          for TABLE in Roles Disciplines Users Events EventCategories Enrolments Results; do
+            if ! grep -qi "CREATE TABLE dbo.$TABLE" "$SCRIPT"; then
+              echo "::error::CREATE TABLE for $TABLE is missing from $SCRIPT"
+              MISSING=1
+            else
+              echo "  $TABLE found"
+            fi
+          done
+          exit $MISSING
+
+      - name: Check the SQL script defines keys and constraints
+        run: |
+          SCRIPT=$(ls docs/*.sql | head -n 1)
+          for KEYWORD in "PRIMARY KEY" "FOREIGN KEY" "UNIQUE" "CHECK" "DEFAULT" "NOT NULL"; do
+            COUNT=$(grep -o "$KEYWORD" "$SCRIPT" | wc -l)
+            if [ "$COUNT" -eq 0 ]; then
+              echo "::error::No $KEYWORD constraints found in the SQL script."
+              exit 1
+            fi
+            echo "  $KEYWORD: $COUNT"
+          done
+
+      - name: Check the SQL script seeds sample data
+        run: |
+          SCRIPT=$(ls docs/*.sql | head -n 1)
+          INSERTS=$(grep -ci "INSERT INTO" "$SCRIPT")
+          if [ "$INSERTS" -lt 6 ]; then
+            echo "::error::Only $INSERTS INSERT statements found. The brief requires seed data for every entity."
+            exit 1
+          fi
+          echo "Found $INSERTS INSERT statements."
+
+      # The README carries the system description, the role descriptions, the
+      # CI screenshot and the video link, so it is worth failing the build if it
+      # is missing or has been left empty.
+      - name: Confirm the README is present and describes both roles
+        run: |
+          if [ ! -f "README.md" ]; then
+            echo "::error::README.md is missing from the repository root."
+            exit 1
+          fi
+          for ROLE in Organiser Participant; do
+            if ! grep -qi "$ROLE" README.md; then
+              echo "::error::README.md does not describe the $ROLE role."
+              exit 1
+            fi
+            echo "  $ROLE described"
+          done
+
+      - name: Summary
+        run: echo "All Part 1 deliverables validated successfully."
