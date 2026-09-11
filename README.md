@@ -69,7 +69,7 @@ route, description, required role, request body and expected response including
 failure status codes. The API built in Part 2 is implemented against this
 specification.
 
-### SQL script — `docs/raceday_schema.sql`
+### SQL script - `docs/raceday_schema.sql`
 
 Creates the full schema and seeds it with realistic sample data: two organisers,
 four participants, three events across the three disciplines, categories for
