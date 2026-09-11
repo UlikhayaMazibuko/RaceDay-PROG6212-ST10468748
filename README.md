@@ -108,5 +108,6 @@ defined, that seed data is present, and that this README describes both roles.
 
 **Green build screenshot:**
 
-<REMEMBER TO PASTE REMBER TO PASTE HERE>
+<img width="1897" height="967" alt="ci-green-build" src="https://github.com/user-attachments/assets/e0cf3a69-04f5-4b4e-b250-3ac741ea2892" />
+
 
