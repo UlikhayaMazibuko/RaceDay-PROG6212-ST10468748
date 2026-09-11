@@ -2,7 +2,7 @@
 
 **Module:** Programming 2B (PROG6212)
 **Student:** Ulikhaya A. Mazibuko (ST10468748)
-**Part:** 1 of 3 — System Planning and Database
+**Part:** 1 of 3
 
 ---
 
