@@ -8,6 +8,8 @@
 
         public int CapturedByUserId { get; set; }
 
+        public TimeOnly? FinishTime { get; set; }
+
         public int? PositionOverall { get; set; }
 
         public int? PositionInCategory { get; set; }
