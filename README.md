@@ -145,4 +145,5 @@ Two GitHub Actions workflows run on every push and pull request:
 
 **Part 2 green build screenshot:**
 
-<!-- I'll post the Part 2 CI screenshot here -->
+<img width="1900" height="880" alt="image" src="https://github.com/user-attachments/assets/29351461-9967-4c36-b5f7-575c11acb5c7" />
+
