@@ -2,7 +2,7 @@
 
 **Module:** Programming 2B (PROG6212)
 **Student:** Ulikhaya A. Mazibuko (ST10468748)
-**Part:** 1 of 3
+**Part:** 2 of 3
 
 ---
 
@@ -20,9 +20,16 @@ can browse upcoming events, enter by choosing a category, see everything they
 have entered, and keep a personal race history across every event they have
 completed.
 
-This repository covers Part 1, which is the planning stage. No application code
-is written here. Part 2 builds the RESTful API in C# against the plan in this
-repository and Part 3 adds the MVC front end, Azure Blob Storage and Docker.
+## Repository layout
+
+| Folder | Part | Contents |
+|---|---|---|
+| `docs/` | Part 1 | Planning documents: ERD, API endpoint plan and SQL script |
+| `Part2/` | Part 2 | RESTful API in ASP.NET Core Web API (C#), with unit tests |
+| `.github/workflows/` | Parts 1 and 2 | CI workflows that run on every push |
+
+Part 1 is the planning stage. Part 2 builds the RESTful API in C# against the
+Part 1 plan. Part 3 will add the MVC front end, Azure Blob Storage and Docker.
 
 ## The two roles
 
@@ -99,15 +106,43 @@ The SQL script matches the ERD exactly. Every table, column, key and constraint
 on the diagram has a direct equivalent in the script, and there are no
 deliberate differences to explain.
 
+## Part 2: RESTful API
+
+The API lives in the `Part2` folder. Full setup steps, the role permissions, all
+29 endpoints and the test coverage are documented in
+[`Part2/README.md`](Part2/README.md).
+
+In summary:
+
+- ASP.NET Core Web API on .NET 10, with Entity Framework Core Code-First against
+  SQL Server. The database schema matches the Part 1 ERD and SQL script.
+- Session based authentication for the Organiser and Participant roles, with
+  passwords hashed using ASP.NET Core's `PasswordHasher` (PBKDF2).
+- All 29 endpoints from the Part 1 plan, each documented in Swagger with its
+  purpose, input and responses.
+- 36 xUnit tests covering registration and login, event management, role
+  rejection and enrolments, with both success and failure cases.
+
+### Quick start
+
+1. Open `Part2/Part2.slnx` in Visual Studio 2026.
+2. Check the `RaceDayDb` connection string in `Part2/RaceDay.Api/appsettings.json`.
+3. Run `Update-Database` in the Package Manager Console to create the database.
+4. Press F5 and open `https://localhost:7015/swagger`.
+
 ## CI/CD
 
-The workflow at `.github/workflows/validate-docs.yml` runs on every push. It
-checks that the `/docs` folder exists and holds all three deliverables, that the
-SQL script creates all seven tables from the ERD, that keys and constraints are
-defined, that seed data is present, and that this README describes both roles.
+Two GitHub Actions workflows run on every push and pull request:
 
-**Green build screenshot:**
+| Workflow | File | What it checks |
+|---|---|---|
+| Validate Part 1 Documentation | `.github/workflows/validate-docs.yml` | The `/docs` folder holds all three Part 1 deliverables, the SQL script creates all seven tables with keys, constraints and seed data, and this README describes both roles |
+| Part 2 API build and tests | `.github/workflows/part2-api-ci.yml` | Installs the .NET 10 SDK, restores and builds the Part 2 solution, and runs all the unit tests. The build fails if any test fails |
+
+**Part 1 green build screenshot:**
 
 <img width="1897" height="967" alt="ci-green-build" src="https://github.com/user-attachments/assets/e0cf3a69-04f5-4b4e-b250-3ac741ea2892" />
 
+**Part 2 green build screenshot:**
 
+<!-- I'll post the Part 2 CI screenshot here -->
