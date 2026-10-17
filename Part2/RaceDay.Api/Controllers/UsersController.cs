@@ -8,9 +8,11 @@ using RaceDay.Api.Security;
 
 namespace RaceDay.Api.Controllers
 {
+
     [ApiController]
     [Route("api/users")]
     [RequireRole]
+    [Produces("application/json")]
     public class UsersController : ControllerBase
     {
         private readonly RaceDayDbContext _db;
@@ -23,6 +25,8 @@ namespace RaceDay.Api.Controllers
         }
 
         [HttpGet("me")]
+        [ProducesResponseType(typeof(UserProfileResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetMyProfile()
         {
             var user = await FindCurrentUserAsync();
@@ -35,6 +39,9 @@ namespace RaceDay.Api.Controllers
         }
 
         [HttpPut("me")]
+        [ProducesResponseType(typeof(UserProfileResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> UpdateMyProfile(UpdateProfileRequest request)
         {
             var user = await FindCurrentUserAsync();
@@ -55,6 +62,9 @@ namespace RaceDay.Api.Controllers
         }
 
         [HttpPut("me/password")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> ChangeMyPassword(ChangePasswordRequest request)
         {
             var user = await FindCurrentUserAsync();

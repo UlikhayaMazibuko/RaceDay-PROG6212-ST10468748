@@ -11,6 +11,7 @@ namespace RaceDay.Api.Controllers
 
     [ApiController]
     [Route("api/auth")]
+    [Produces("application/json")]
     public class AuthController : ControllerBase
     {
         private readonly RaceDayDbContext _db;
@@ -22,10 +23,13 @@ namespace RaceDay.Api.Controllers
             _passwordHasher = passwordHasher;
         }
 
+        
         [HttpPost("register")]
+        [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
-
             var email = request.Email.Trim().ToLowerInvariant();
 
             if (request.DateOfBirth!.Value >= DateOnly.FromDateTime(DateTime.Today))
@@ -65,6 +69,9 @@ namespace RaceDay.Api.Controllers
         }
 
         [HttpPost("login")]
+        [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Login(LoginRequest request)
         {
             var email = request.Email.Trim().ToLowerInvariant();
@@ -98,6 +105,8 @@ namespace RaceDay.Api.Controllers
 
         [HttpPost("logout")]
         [RequireRole]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
@@ -107,6 +116,8 @@ namespace RaceDay.Api.Controllers
 
         [HttpGet("session")]
         [RequireRole]
+        [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetSession()
         {
             var userId = HttpContext.GetCurrentUserId()!.Value;

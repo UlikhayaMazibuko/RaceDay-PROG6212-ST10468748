@@ -8,6 +8,7 @@ namespace RaceDay.Api.Controllers
 
     [ApiController]
     [Route("api/disciplines")]
+    [Produces("application/json")]
     public class DisciplinesController : ControllerBase
     {
         private readonly RaceDayDbContext _db;
@@ -18,6 +19,7 @@ namespace RaceDay.Api.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(List<DisciplineResponse>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetDisciplines()
         {
             var disciplines = await _db.Disciplines
