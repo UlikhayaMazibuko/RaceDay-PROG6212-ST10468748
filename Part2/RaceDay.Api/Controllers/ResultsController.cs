@@ -9,6 +9,7 @@ namespace RaceDay.Api.Controllers
 {
 
     [ApiController]
+    [Produces("application/json")]
     public class ResultsController : ControllerBase
     {
         private readonly RaceDayDbContext _db;
@@ -20,6 +21,12 @@ namespace RaceDay.Api.Controllers
 
         [HttpPost("api/enrolments/{enrolmentId:int}/result")]
         [RequireRole(RoleNames.Organiser)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> CaptureResult(int enrolmentId, ResultRequest request)
         {
             var enrolment = await _db.Enrolments
@@ -70,6 +77,11 @@ namespace RaceDay.Api.Controllers
 
         [HttpPut("api/results/{id:int}")]
         [RequireRole(RoleNames.Organiser)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> CorrectResult(int id, ResultRequest request)
         {
             var result = await _db.Results
@@ -105,6 +117,9 @@ namespace RaceDay.Api.Controllers
 
         [HttpGet("api/results/mine")]
         [RequireRole(RoleNames.Participant)]
+        [ProducesResponseType(typeof(List<ResultResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetMyResults()
         {
             var participantId = HttpContext.GetCurrentUserId()!.Value;
@@ -117,6 +132,8 @@ namespace RaceDay.Api.Controllers
         }
 
         [HttpGet("api/events/{eventId:int}/results")]
+        [ProducesResponseType(typeof(List<ResultResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetResultsForEvent(int eventId)
         {
             if (!await _db.Events.AnyAsync(e => e.EventId == eventId))

@@ -7,8 +7,9 @@ using RaceDay.Api.Security;
 
 namespace RaceDay.Api.Controllers
 {
-   
+
     [ApiController]
+    [Produces("application/json")]
     public class EnrolmentsController : ControllerBase
     {
         private readonly RaceDayDbContext _db;
@@ -20,6 +21,11 @@ namespace RaceDay.Api.Controllers
 
         [HttpPost("api/categories/{categoryId:int}/enrolments")]
         [RequireRole(RoleNames.Participant)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> Enrol(int categoryId)
         {
             var participantId = HttpContext.GetCurrentUserId()!.Value;
@@ -82,6 +88,9 @@ namespace RaceDay.Api.Controllers
 
         [HttpGet("api/enrolments/mine")]
         [RequireRole(RoleNames.Participant)]
+        [ProducesResponseType(typeof(List<EnrolmentResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetMyEnrolments()
         {
             var participantId = HttpContext.GetCurrentUserId()!.Value;
@@ -95,6 +104,10 @@ namespace RaceDay.Api.Controllers
 
         [HttpGet("api/enrolments/{id:int}")]
         [RequireRole]
+        [ProducesResponseType(typeof(EnrolmentResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetEnrolment(int id)
         {
             var enrolment = await ToResponses(_db.Enrolments.Where(en => en.EnrolmentId == id))
@@ -121,6 +134,10 @@ namespace RaceDay.Api.Controllers
 
         [HttpGet("api/events/{eventId:int}/enrolments")]
         [RequireRole(RoleNames.Organiser)]
+        [ProducesResponseType(typeof(List<EnrolmentResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetEnrolmentsForEvent(int eventId)
         {
             var ev = await _db.Events.FindAsync(eventId);
@@ -144,6 +161,11 @@ namespace RaceDay.Api.Controllers
 
         [HttpPut("api/enrolments/{id:int}/status")]
         [RequireRole(RoleNames.Organiser)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateStatus(int id, UpdateEnrolmentStatusRequest request)
         {
             var enrolment = await _db.Enrolments
@@ -169,6 +191,11 @@ namespace RaceDay.Api.Controllers
 
         [HttpDelete("api/enrolments/{id:int}")]
         [RequireRole(RoleNames.Participant)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> Withdraw(int id)
         {
             var enrolment = await _db.Enrolments

@@ -7,7 +7,9 @@ using RaceDay.Api.Security;
 
 namespace RaceDay.Api.Controllers
 {
+   
     [ApiController]
+    [Produces("application/json")]
     public class CategoriesController : ControllerBase
     {
         private readonly RaceDayDbContext _db;
@@ -18,6 +20,8 @@ namespace RaceDay.Api.Controllers
         }
 
         [HttpGet("api/events/{eventId:int}/categories")]
+        [ProducesResponseType(typeof(List<CategoryResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetCategoriesForEvent(int eventId)
         {
             if (!await _db.Events.AnyAsync(e => e.EventId == eventId))
@@ -33,6 +37,8 @@ namespace RaceDay.Api.Controllers
         }
 
         [HttpGet("api/categories/{id:int}")]
+        [ProducesResponseType(typeof(CategoryResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetCategory(int id)
         {
             var category = await ToResponses(_db.EventCategories.Where(c => c.CategoryId == id))
@@ -48,6 +54,12 @@ namespace RaceDay.Api.Controllers
 
         [HttpPost("api/events/{eventId:int}/categories")]
         [RequireRole(RoleNames.Organiser)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> CreateCategory(int eventId, CategoryRequest request)
         {
             var ev = await _db.Events.FindAsync(eventId);
@@ -80,6 +92,12 @@ namespace RaceDay.Api.Controllers
 
         [HttpPut("api/categories/{id:int}")]
         [RequireRole(RoleNames.Organiser)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> UpdateCategory(int id, CategoryRequest request)
         {
             var category = await _db.EventCategories
@@ -118,6 +136,11 @@ namespace RaceDay.Api.Controllers
 
         [HttpDelete("api/categories/{id:int}")]
         [RequireRole(RoleNames.Organiser)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> DeleteCategory(int id)
         {
             var category = await _db.EventCategories
@@ -154,6 +177,7 @@ namespace RaceDay.Api.Controllers
             category.MaxParticipants = request.MaxParticipants;
             category.MinimumAge = request.MinimumAge;
         }
+
         private static IQueryable<CategoryResponse> ToResponses(IQueryable<EventCategory> query)
         {
             return query.Select(c => new CategoryResponse

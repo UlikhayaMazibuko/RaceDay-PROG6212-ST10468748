@@ -7,8 +7,10 @@ using RaceDay.Api.Security;
 
 namespace RaceDay.Api.Controllers
 {
+
     [ApiController]
     [Route("api/events")]
+    [Produces("application/json")]
     public class EventsController : ControllerBase
     {
         private readonly RaceDayDbContext _db;
@@ -19,12 +21,12 @@ namespace RaceDay.Api.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(List<EventSummaryResponse>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetEvents([FromQuery] string? city, [FromQuery] int? disciplineId, [FromQuery] DateOnly? fromDate)
         {
             var query = _db.Events
                 .Where(e => e.Status == "Published" || e.Status == "Completed");
 
-      
             if (!string.IsNullOrWhiteSpace(city))
             {
                 query = query.Where(e => e.City == city);
@@ -45,6 +47,8 @@ namespace RaceDay.Api.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [ProducesResponseType(typeof(EventDetailResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetEvent(int id)
         {
             var ev = await _db.Events
@@ -90,6 +94,9 @@ namespace RaceDay.Api.Controllers
 
         [HttpGet("mine")]
         [RequireRole(RoleNames.Organiser)]
+        [ProducesResponseType(typeof(List<EventSummaryResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetMyEvents()
         {
             var organiserId = HttpContext.GetCurrentUserId()!.Value;
@@ -105,6 +112,10 @@ namespace RaceDay.Api.Controllers
 
         [HttpPost]
         [RequireRole(RoleNames.Organiser)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> CreateEvent(CreateEventRequest request)
         {
             var problem = await ValidateEventAsync(request);
@@ -134,6 +145,11 @@ namespace RaceDay.Api.Controllers
 
         [HttpPut("{id:int}")]
         [RequireRole(RoleNames.Organiser)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateEvent(int id, UpdateEventRequest request)
         {
             var ev = await _db.Events.FindAsync(id);
@@ -142,7 +158,6 @@ namespace RaceDay.Api.Controllers
                 return NotFound(new { message = "No event with that id." });
             }
 
-      
             if (ev.OrganiserId != HttpContext.GetCurrentUserId())
             {
                 return StatusCode(StatusCodes.Status403Forbidden, new { message = "You can only change events you created." });
@@ -164,6 +179,11 @@ namespace RaceDay.Api.Controllers
 
         [HttpDelete("{id:int}")]
         [RequireRole(RoleNames.Organiser)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> DeleteEvent(int id)
         {
             var ev = await _db.Events.FindAsync(id);
@@ -219,6 +239,7 @@ namespace RaceDay.Api.Controllers
             ev.RegistrationCloseDate = request.RegistrationCloseDate!.Value;
         }
 
+  
         private static IQueryable<EventSummaryResponse> ToSummaries(IQueryable<Event> query)
         {
             return query.Select(e => new EventSummaryResponse
