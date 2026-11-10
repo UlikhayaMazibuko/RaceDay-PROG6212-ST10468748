@@ -5,8 +5,8 @@ using RaceDay.Web.Services;
 
 namespace RaceDay.Web.Filters
 {
-    // Protects pages. Visitors who are not logged in are sent to the login page (and brought
-    // back afterwards). Logged in users with the wrong role are sent to their own home page.
+    // This filter protects the pages that need a login.
+    // If nobody is logged in it goes to the login page, and if the role is wrong it goes back to their own home page
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class RequireLoginAttribute : Attribute, IAuthorizationFilter
     {

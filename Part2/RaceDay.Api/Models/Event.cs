@@ -30,7 +30,7 @@
 
         public string Status { get; set; } = "Draft";
 
-        // Public Azure Blob Storage URL of the event banner. Null until a banner is uploaded.
+        // PART 3 ADDITION: Azure link to the event banner, empty until the organiser uploads one
         public string? BannerImageUrl { get; set; }
 
         public DateTime CreatedAt { get; set; }

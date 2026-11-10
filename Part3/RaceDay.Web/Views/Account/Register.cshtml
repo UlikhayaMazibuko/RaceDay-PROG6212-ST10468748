@@ -15,10 +15,10 @@
                     <label class="form-label d-block">@Html.DisplayNameFor(m => m.RoleId)</label>
                     <div class="role-choice">
                         <input type="radio" class="btn-check" asp-for="RoleId" value="2" id="roleParticipant" />
-                        <label class="btn btn-outline-rd" for="roleParticipant">🏃 Participant<small>Enter events and track results</small></label>
+                        <label class="btn btn-outline-rd" for="roleParticipant">Participant<small>Enter events and track results</small></label>
 
                         <input type="radio" class="btn-check" asp-for="RoleId" value="1" id="roleOrganiser" />
-                        <label class="btn btn-outline-rd" for="roleOrganiser">📋 Organiser<small>Create and manage events</small></label>
+                        <label class="btn btn-outline-rd" for="roleOrganiser">Organiser<small>Create and manage events</small></label>
                     </div>
                     <span asp-validation-for="RoleId" class="text-danger small"></span>
                 </div>

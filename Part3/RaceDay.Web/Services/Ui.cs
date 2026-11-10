@@ -1,9 +1,9 @@
 namespace RaceDay.Web.Services
 {
-    // Small display helpers shared by the views, so colours and wording stay consistent.
+    // This class has small helpers the views use so the colours and wording are the same on every page
     public static class Ui
     {
-        // Colour coding for every status shown in the site.
+        // Picks the badge colour for each status, green for Confirmed and amber for Pending
         public static string BadgeClass(string? status) => status switch
         {
             "Confirmed" or "Published" or "Finished" => "badge-status badge-green",
@@ -13,15 +13,7 @@ namespace RaceDay.Web.Services
             _ => "badge-status badge-grey"
         };
 
-        public static string DisciplineIcon(string? discipline) => discipline switch
-        {
-            "Running" => "🏃",
-            "Walking" => "🚶",
-            "Cycling" => "🚴",
-            _ => "🏁"
-        };
-
-        // 1 -> 1st, 2 -> 2nd, 11 -> 11th, 23 -> 23rd
+        // Turns a position into 1st, 2nd, 3rd and so on (11, 12 and 13 always end in th)
         public static string Ordinal(int number)
         {
             var lastTwo = number % 100;

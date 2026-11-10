@@ -4,7 +4,7 @@ using RaceDay.Web.Services;
 
 namespace RaceDay.Web.Controllers
 {
-    // Participant-only pages: entering an event, My Events and My Results.
+    // This controller has the pages only participants can use: entering an event, My Events and My Results
     [RequireLogin(Roles.Participant)]
     public class ParticipantController : BaseController
     {

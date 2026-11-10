@@ -5,7 +5,7 @@ using RaceDay.Web.Services;
 
 namespace RaceDay.Web.Controllers
 {
-    // Public pages: the list of upcoming events with filters, and the full event detail page.
+    // This controller has the public pages: the events list with filters and the event details page
     public class HomeController : BaseController
     {
         public HomeController(ApiClient api) : base(api)
@@ -14,7 +14,7 @@ namespace RaceDay.Web.Controllers
 
         public async Task<IActionResult> Index(string? city, int? disciplineId, DateOnly? fromDate)
         {
-            // By default only upcoming events are shown.
+            // If no date is picked we only show events from today onwards
             var from = fromDate ?? DateOnly.FromDateTime(DateTime.Today);
 
             var model = new HomeViewModel { City = city, DisciplineId = disciplineId, FromDate = from };
@@ -56,7 +56,7 @@ namespace RaceDay.Web.Controllers
                     && ev.Data.RegistrationCloseDate >= DateOnly.FromDateTime(DateTime.Today)
             };
 
-            // Show "Entered" instead of the Enter button on categories this participant already entered.
+            // Gets the participant's enrolments so the page shows "Entered" instead of the Enter button
             if (HttpContext.Session.IsParticipant())
             {
                 var mine = await Api.GetMyEnrolmentsAsync();

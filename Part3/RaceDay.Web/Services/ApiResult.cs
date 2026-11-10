@@ -1,6 +1,6 @@
 namespace RaceDay.Web.Services
 {
-    // The outcome of one API call: either the data, or the status code and a readable message.
+    // This holds the result of an API call, either the data or the error message
     public class ApiResult<T>
     {
         public bool Success { get; init; }
@@ -15,7 +15,7 @@ namespace RaceDay.Web.Services
             new() { Success = false, StatusCode = statusCode, Error = error };
     }
 
-    // Used for calls where the API returns no body (204 No Content).
+    // Used for API calls that don't return anything (204 No Content)
     public class NoData
     {
     }

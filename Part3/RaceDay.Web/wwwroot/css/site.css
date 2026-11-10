@@ -1,4 +1,4 @@
-/* RaceDay theme: deep navy with an energetic orange, bold condensed headings. */
+/* RaceDay colours and fonts */
 :root {
     --rd-navy: #0b1f3a;
     --rd-navy-2: #14305a;
@@ -119,7 +119,7 @@ dd { margin-bottom: .75rem; }
     padding: .15rem .55rem; border-radius: 6px; letter-spacing: 1px;
 }
 
-/* Colour-coded statuses: green Confirmed, amber Pending, red Cancelled. */
+/* Status colours: green for Confirmed, amber for Pending, red for Cancelled */
 .badge-status { display: inline-block; padding: .3rem .7rem; border-radius: 999px; font-size: .78rem; font-weight: 600; }
 .badge-green { background: #d9f5e3; color: #146c3a; }
 .badge-amber { background: #fff1cc; color: #8a5a00; }

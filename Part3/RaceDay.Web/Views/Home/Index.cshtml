@@ -48,7 +48,7 @@ else
             <div class="col-md-6 col-lg-4">
                 <a asp-action="Details" asp-route-id="@ev.EventId" class="event-card">
                     <div class="event-banner" style="@(string.IsNullOrEmpty(ev.BannerImageUrl) ? "" : $"background-image:url('{ev.BannerImageUrl}')")">
-                        <span class="event-type">@Ui.DisciplineIcon(ev.DisciplineName) @ev.DisciplineName</span>
+                        <span class="event-type">@ev.DisciplineName</span>
                         <span class="event-date">
                             <strong>@ev.EventDate.ToString("dd")</strong>
                             @ev.EventDate.ToString("MMM").ToUpper()
@@ -56,7 +56,7 @@ else
                     </div>
                     <div class="event-body">
                         <h2>@ev.EventName</h2>
-                        <p class="mb-1">📍 @ev.VenueName, @ev.City</p>
+                        <p class="mb-1">@ev.VenueName, @ev.City</p>
                         <p class="mb-2 text-muted small">@ev.EventDate.ToString("dddd, d MMMM yyyy") · Start @ev.StartTime.ToString("HH:mm")</p>
                         <p class="distances mb-0">@Ui.Distances(ev.DistancesKm)</p>
                     </div>

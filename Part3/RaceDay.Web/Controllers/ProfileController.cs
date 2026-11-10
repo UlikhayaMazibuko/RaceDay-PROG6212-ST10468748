@@ -5,7 +5,8 @@ using RaceDay.Web.Services;
 
 namespace RaceDay.Web.Controllers
 {
-    // View and update your own profile, and upload a profile picture (stored in Azure by the API).
+    // This controller lets the user view and update their profile and upload a profile picture.
+    // The picture is sent to the API, and the API saves it in Azure
     [RequireLogin]
     public class ProfileController : BaseController
     {
@@ -30,7 +31,7 @@ namespace RaceDay.Web.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(ProfileViewModel model)
         {
-            // Date of birth is display only on this page and cannot be changed here.
+            // Date of birth is only shown on this page, it can't be changed, so we don't validate it
             ModelState.Remove(nameof(model.DateOfBirth));
 
             if (!ModelState.IsValid)

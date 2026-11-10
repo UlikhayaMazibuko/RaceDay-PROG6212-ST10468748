@@ -1,7 +1,7 @@
 namespace RaceDay.Web.Models
 {
-    // These classes mirror the JSON the Part 2 API sends and receives. They are data shapes only;
-    // every rule (who can do what, capacity, dates) is enforced by the API, not here.
+    // These classes match the JSON that the Part 2 API sends and receives.
+    // There is no logic in here, all the rules are checked by the API
 
     public class LoginRequest
     {
@@ -120,7 +120,7 @@ namespace RaceDay.Web.Models
         public string Province { get; set; } = string.Empty;
         public DateOnly? RegistrationCloseDate { get; set; }
 
-        // Only sent when updating. Left null on create, where the API publishes the event.
+        // Only used when editing an event, on create the API sets the status itself
         public string? Status { get; set; }
     }
 

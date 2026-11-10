@@ -4,14 +4,14 @@ using Azure.Storage.Blobs.Models;
 
 namespace RaceDay.Api.Services
 {
-    // Anything that can store an uploaded image and give back a public URL for it.
+    // PART 3 ADDITION: This interface is used so the controller doesn't depend on Azure directly
     public interface IImageStorage
     {
         Task<string> UploadAsync(IFormFile file, string folder);
     }
 
-    // Stores images in an Azure Blob Storage container. The container is created on first use
-    // with public read access on blobs, so the MVC site can show images straight from the URL.
+    // PART 3 ADDITION: This class uploads images to Azure Blob Storage.
+    // The container is created the first time it's used and is public so the website can show the images
     public class BlobImageStorage : IImageStorage
     {
         private readonly string? _connectionString;
@@ -28,7 +28,7 @@ namespace RaceDay.Api.Services
         {
             var container = await GetContainerAsync();
 
-            // A random name stops two uploads with the same file name overwriting each other.
+            // Uses a random file name so two images with the same name don't replace each other
             var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
             var blob = container.GetBlobClient($"{folder}/{Guid.NewGuid():N}{extension}");
 

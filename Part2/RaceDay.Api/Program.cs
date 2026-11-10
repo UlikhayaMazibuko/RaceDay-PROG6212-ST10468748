@@ -11,8 +11,8 @@ builder.Services.AddDbContext<RaceDayDbContext>(options =>
 
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
-// Event banners and profile pictures are stored in Azure Blob Storage. The connection string
-// is kept in User Secrets (never in appsettings.json), under AzureStorage:ConnectionString.
+// PART 3 ADDITION: Image storage for event banners and profile pictures in Azure Blob Storage.
+// The connection string is in User Secrets so it doesn't get pushed to GitHub
 builder.Services.AddSingleton<IImageStorage, BlobImageStorage>();
 
 builder.Services.AddDistributedMemoryCache();
@@ -50,8 +50,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// HTTPS redirection is skipped while developing so the MVC app running in Docker can call the
-// API over http://host.docker.internal:5106 without needing the development certificate.
+// PART 3 ADDITION: HTTPS redirection is only used outside development so the MVC app
+// in Docker can call the API over http without needing the dev certificate
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();

@@ -165,6 +165,10 @@ request with two jobs:
 
 <!-- Part 3 CI screenshot goes here -->
 
+## Demonstration video
+
+YouTube link: *to be added*
+
 ## AI usage
 
 AI tools (Claude) were used to assist with planning and code during this project.

@@ -22,7 +22,7 @@
 
         public string? City { get; set; }
 
-        // Public Azure Blob Storage URL of the profile picture. Null until one is uploaded.
+        // PART 3 ADDITION: Azure link to the profile picture, empty until the user uploads one
         public string? ProfilePictureUrl { get; set; }
 
         public DateTime CreatedAt { get; set; }

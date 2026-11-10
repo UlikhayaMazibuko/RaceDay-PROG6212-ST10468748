@@ -5,8 +5,8 @@ using RaceDay.Web.Models;
 
 namespace RaceDay.Web.Services
 {
-    // The only place the website talks to the outside world. Every page goes through here to
-    // reach the Part 2 API, so there is no database access and no business logic in this project.
+    // This class does all the calls to the Part 2 API.
+    // Every page uses this, so the MVC project has no database access and no business logic
     public class ApiClient
     {
         private const string ApiCookieName = ".RaceDay.Session";
@@ -24,7 +24,7 @@ namespace RaceDay.Web.Services
 
         private ISession? Session => _context.HttpContext?.Session;
 
-        // ---------- Auth ----------
+        // Auth
         public Task<ApiResult<AuthResponse>> LoginAsync(LoginRequest request) =>
             SendAsync<AuthResponse>(HttpMethod.Post, "api/auth/login", request);
 
@@ -34,7 +34,7 @@ namespace RaceDay.Web.Services
         public Task<ApiResult<NoData>> LogoutAsync() =>
             SendAsync<NoData>(HttpMethod.Post, "api/auth/logout");
 
-        // ---------- Profile ----------
+        // Profile
         public Task<ApiResult<UserProfile>> GetProfileAsync() =>
             SendAsync<UserProfile>(HttpMethod.Get, "api/users/me");
 
@@ -44,7 +44,7 @@ namespace RaceDay.Web.Services
         public Task<ApiResult<ImageUploadResponse>> UploadProfilePictureAsync(IFormFile file) =>
             UploadAsync("api/users/me/picture", file);
 
-        // ---------- Disciplines and events ----------
+        // Disciplines and events
         public Task<ApiResult<List<Discipline>>> GetDisciplinesAsync() =>
             SendAsync<List<Discipline>>(HttpMethod.Get, "api/disciplines");
 
@@ -77,7 +77,7 @@ namespace RaceDay.Web.Services
         public Task<ApiResult<ImageUploadResponse>> UploadEventBannerAsync(int eventId, IFormFile file) =>
             UploadAsync($"api/events/{eventId}/banner", file);
 
-        // ---------- Categories ----------
+        // Categories
         public Task<ApiResult<List<Category>>> GetCategoriesAsync(int eventId) =>
             SendAsync<List<Category>>(HttpMethod.Get, $"api/events/{eventId}/categories");
 
@@ -87,7 +87,7 @@ namespace RaceDay.Web.Services
         public Task<ApiResult<NoData>> DeleteCategoryAsync(int categoryId) =>
             SendAsync<NoData>(HttpMethod.Delete, $"api/categories/{categoryId}");
 
-        // ---------- Enrolments ----------
+        // Enrolments
         public Task<ApiResult<NewEnrolment>> EnrolAsync(int categoryId) =>
             SendAsync<NewEnrolment>(HttpMethod.Post, $"api/categories/{categoryId}/enrolments");
 
@@ -103,7 +103,7 @@ namespace RaceDay.Web.Services
         public Task<ApiResult<NoData>> UpdateEnrolmentStatusAsync(int enrolmentId, string status) =>
             SendAsync<NoData>(HttpMethod.Put, $"api/enrolments/{enrolmentId}/status", new { enrolmentStatus = status });
 
-        // ---------- Results ----------
+        // Results
         public Task<ApiResult<NoData>> CaptureResultAsync(int enrolmentId, ResultRequest request) =>
             SendAsync<NoData>(HttpMethod.Post, $"api/enrolments/{enrolmentId}/result", request);
 
@@ -113,9 +113,9 @@ namespace RaceDay.Web.Services
         public Task<ApiResult<List<RaceResult>>> GetEventResultsAsync(int eventId) =>
             SendAsync<List<RaceResult>>(HttpMethod.Get, $"api/events/{eventId}/results");
 
-        // ---------- Plumbing ----------
+        // These methods do the actual sending and reading for all the calls above
 
-        // Sends a file to the API as multipart form data. The API (not this website) stores it in Azure.
+        // Sends the image to the API as form data, the API is the one that uploads it to Azure
         private async Task<ApiResult<ImageUploadResponse>> UploadAsync(string path, IFormFile file)
         {
             var form = new MultipartFormDataContent();
@@ -137,7 +137,7 @@ namespace RaceDay.Web.Services
         {
             using var request = new HttpRequestMessage(method, path) { Content = content };
 
-            // Send the logged in user's API session cookie, so the API knows who is calling.
+            // Adds the user's API cookie so the API knows who is logged in
             var apiCookie = Session?.GetString(SessionKeys.ApiCookie);
             if (!string.IsNullOrEmpty(apiCookie))
             {
@@ -176,8 +176,8 @@ namespace RaceDay.Web.Services
             }
         }
 
-        // When the API sets or clears its session cookie (login and logout), keep a copy in this
-        // website's session so later calls are made as the same user.
+        // When the API sends back its session cookie (on login and logout) we save it in our session
+        // so the next calls are made as the same user
         private void RememberApiCookie(HttpResponseMessage response)
         {
             if (Session is null || !response.Headers.TryGetValues("Set-Cookie", out var cookies))
@@ -204,8 +204,8 @@ namespace RaceDay.Web.Services
             }
         }
 
-        // Turns the API's error body into one readable sentence. The API sends either { message }
-        // or, for validation failures, { title, errors: { field: [messages] } }.
+        // Gets the error message out of the API response so it can be shown to the user.
+        // The API sends either { message } or a list of validation errors
         private static async Task<string> ReadErrorAsync(HttpResponseMessage response)
         {
             try
@@ -242,7 +242,7 @@ namespace RaceDay.Web.Services
             }
             catch (JsonException)
             {
-                // Not JSON, fall through to the generic message below.
+                // If it isn't JSON we just use the normal message below
             }
 
             return response.StatusCode switch

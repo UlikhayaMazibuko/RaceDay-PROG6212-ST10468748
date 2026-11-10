@@ -5,8 +5,8 @@ using RaceDay.Web.Services;
 
 namespace RaceDay.Web.Controllers
 {
-    // Organiser-only pages: dashboard, event management (with banner upload), categories,
-    // enrolments and results entry. The API also checks that the organiser owns each event.
+    // This controller has all the organiser pages: dashboard, events, categories, enrolments and results.
+    // The API still checks that the organiser owns the event, this side just shows the pages
     [RequireLogin(Roles.Organiser)]
     public class OrganiserController : BaseController
     {
@@ -14,7 +14,7 @@ namespace RaceDay.Web.Controllers
         {
         }
 
-        // ---------- Dashboard ----------
+        // Dashboard
         public async Task<IActionResult> Dashboard()
         {
             var result = await Api.GetMyEventsAsync();
@@ -33,7 +33,7 @@ namespace RaceDay.Web.Controllers
             });
         }
 
-        // ---------- Create event ----------
+        // Create event
         [HttpGet]
         public async Task<IActionResult> CreateEvent()
         {
@@ -81,7 +81,7 @@ namespace RaceDay.Web.Controllers
             var eventId = created.Data.EventId;
             var messages = new List<string> { $"\"{created.Data.EventName}\" has been created." };
 
-            // The event's first distance becomes its first category.
+            // The distance typed on the form gets saved as the event's first category
             var categoryName = string.IsNullOrWhiteSpace(model.FirstCategoryName)
                 ? $"{model.DistanceKm:0.##} km"
                 : model.FirstCategoryName.Trim();
@@ -106,7 +106,7 @@ namespace RaceDay.Web.Controllers
             return RedirectToAction(nameof(Categories), new { id = eventId });
         }
 
-        // ---------- Edit event ----------
+        // Edit event
         [HttpGet]
         public async Task<IActionResult> EditEvent(int id)
         {
@@ -183,7 +183,7 @@ namespace RaceDay.Web.Controllers
             return RedirectToAction(nameof(Dashboard));
         }
 
-        // ---------- Delete event ----------
+        // Delete event
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteEvent(int id)
         {
@@ -196,7 +196,7 @@ namespace RaceDay.Web.Controllers
             return RedirectToAction(nameof(Dashboard));
         }
 
-        // ---------- Categories ----------
+        // Categories
         [HttpGet]
         public async Task<IActionResult> Categories(int id)
         {
@@ -245,7 +245,7 @@ namespace RaceDay.Web.Controllers
             return RedirectToAction(nameof(Categories), new { id });
         }
 
-        // ---------- Enrolments ----------
+        // Enrolments
         public async Task<IActionResult> Enrolments(int id)
         {
             var ev = await LoadOwnEvent(id);
@@ -270,7 +270,7 @@ namespace RaceDay.Web.Controllers
             return RedirectToAction(nameof(Enrolments), new { id });
         }
 
-        // ---------- Results ----------
+        // Results
         public async Task<IActionResult> Results(int id)
         {
             var ev = await LoadOwnEvent(id);
@@ -293,7 +293,7 @@ namespace RaceDay.Web.Controllers
         public async Task<IActionResult> CaptureResult(int id, int enrolmentId, string resultStatus,
             TimeOnly? finishTime, int? positionOverall, int? positionInCategory)
         {
-            // DNF, DNS and DQ have no time or positions, so anything typed in is ignored for them.
+            // DNF, DNS and DQ don't have a time or position so we only send those for Finished
             var finished = resultStatus == "Finished";
 
             var result = await Api.CaptureResultAsync(enrolmentId, new ResultRequest
@@ -311,7 +311,7 @@ namespace RaceDay.Web.Controllers
             return RedirectToAction(nameof(Results), new { id });
         }
 
-        // ---------- Helpers ----------
+        // Helper methods used by the pages above
         private async Task LoadDisciplines(EventFormViewModel model)
         {
             var disciplines = await Api.GetDisciplinesAsync();

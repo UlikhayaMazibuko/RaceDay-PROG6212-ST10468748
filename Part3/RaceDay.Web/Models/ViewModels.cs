@@ -2,8 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RaceDay.Web.Models
 {
-    // Shapes used by the pages and forms. The validation attributes give quick, friendly
-    // feedback on the form; the API still checks everything again before saving.
+    // These are the models for the pages and forms.
+    // The validation here just shows errors on the form quickly, the API checks everything again
 
     public class LoginViewModel
     {
@@ -105,10 +105,10 @@ namespace RaceDay.Web.Models
         [Required, Display(Name = "Entries close on")]
         public DateOnly? RegistrationCloseDate { get; set; }
 
-        // Edit only.
+        // Only used on the edit page
         public string Status { get; set; } = "Published";
 
-        // Create only: the event's first distance, so a new event is never left without one.
+        // Only used on the create page, this becomes the event's first category
         [Display(Name = "First category name")]
         public string? FirstCategoryName { get; set; }
 

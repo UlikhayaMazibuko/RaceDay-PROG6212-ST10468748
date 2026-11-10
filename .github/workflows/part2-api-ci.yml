@@ -1,5 +1,5 @@
-# Builds and tests the whole RaceDay system on every push and pull request:
-# the Part 2 API with its unit tests, and the Part 3 MVC web app with its Docker image.
+# This workflow runs on every push. It builds the API and runs the unit tests,
+# then builds the MVC website and its Docker image
 name: RaceDay build, tests and Docker
 
 on:

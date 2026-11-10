@@ -37,7 +37,7 @@ else
                         <tr>
                             <td><a asp-controller="Home" asp-action="Details" asp-route-id="@ev.EventId"><strong>@ev.EventName</strong></a><div class="small text-muted">@ev.City</div></td>
                             <td>@ev.EventDate.ToString("d MMM yyyy")</td>
-                            <td>@Ui.DisciplineIcon(ev.DisciplineName) @ev.DisciplineName</td>
+                            <td>@ev.DisciplineName</td>
                             <td class="small">@Ui.Distances(ev.DistancesKm)</td>
                             <td><strong>@ev.EnrolmentCount</strong></td>
                             <td><span class="@Ui.BadgeClass(ev.Status)">@ev.Status</span></td>

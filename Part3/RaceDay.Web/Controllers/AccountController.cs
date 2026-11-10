@@ -4,8 +4,9 @@ using RaceDay.Web.Services;
 
 namespace RaceDay.Web.Controllers
 {
-    // Register, log in and log out. Each one is a call to the Part 2 API; on success the user's
-    // id, role and name are kept in this website's session for the role-based menus.
+    // This controller handles register, login and logout.
+    // It sends the details to the API, and when login works it saves the user's id, role and name
+    // in the session so the navbar can show the right menu for their role
     public class AccountController : BaseController
     {
         public AccountController(ApiClient api) : base(api)
@@ -87,7 +88,7 @@ namespace RaceDay.Web.Controllers
                 return View(model);
             }
 
-            // Log the new user straight in so they land on their own home page.
+            // Logs the new user in straight away so they don't have to type their details again
             var login = await Api.LoginAsync(new LoginRequest { Email = model.Email, Password = model.Password });
             if (!login.Success || login.Data is null)
             {
@@ -103,7 +104,7 @@ namespace RaceDay.Web.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
-            // End the API session first, then clear this website's session.
+            // Logs out of the API first, then clears this website's session
             await Api.LogoutAsync();
             HttpContext.Session.Clear();
 

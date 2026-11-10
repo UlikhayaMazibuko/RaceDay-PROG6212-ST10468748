@@ -1,6 +1,6 @@
 namespace RaceDay.Web.Services
 {
-    // Names of the values the website keeps in its own session.
+    // The names of the values we save in the session
     public static class SessionKeys
     {
         public const string UserId = "UserId";
@@ -15,7 +15,7 @@ namespace RaceDay.Web.Services
         public const string Participant = "Participant";
     }
 
-    // Small helpers so controllers and views can ask "who is logged in?" in one line.
+    // These make it easy to check who is logged in and what their role is
     public static class SessionUserExtensions
     {
         public static bool IsLoggedIn(this ISession session) => session.GetInt32(SessionKeys.UserId).HasValue;

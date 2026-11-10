@@ -3,7 +3,7 @@ using RaceDay.Web.Services;
 
 namespace RaceDay.Web.Controllers
 {
-    // Shared helpers for every page controller.
+    // This is the base class for the other controllers so they can share the same helper methods
     public abstract class BaseController : Controller
     {
         protected readonly ApiClient Api;
@@ -17,8 +17,8 @@ namespace RaceDay.Web.Controllers
 
         protected void Error(string message) => TempData["Error"] = message;
 
-        // If the API says the user is no longer logged in (for example the API was restarted),
-        // clear this website's session too and send them to log in again.
+        // If the API returns 401 it means the API session ended (for example the API was restarted),
+        // so we clear our session as well and send the user back to the login page
         protected bool SessionExpired<T>(ApiResult<T> result)
         {
             if (result.StatusCode != StatusCodes.Status401Unauthorized)
@@ -33,7 +33,7 @@ namespace RaceDay.Web.Controllers
 
         protected IActionResult ToLogin() => RedirectToAction("Login", "Account");
 
-        // Checks an uploaded image before it is sent to the API.
+        // Checks the image type and size before sending it to the API
         protected static string? CheckImage(IFormFile? file)
         {
             if (file is null || file.Length == 0)
