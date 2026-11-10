@@ -147,3 +147,8 @@ Two GitHub Actions workflows run on every push and pull request:
 
 <img width="1900" height="880" alt="image" src="https://github.com/user-attachments/assets/29351461-9967-4c36-b5f7-575c11acb5c7" />
 
+**POE green build screenshot:**
+
+<img width="1887" height="977" alt="image" src="https://github.com/user-attachments/assets/8d11a3d4-fa55-4305-8652-efa5e58c99d4" />
+
+
