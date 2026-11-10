@@ -1,0 +1,67 @@
+@model HomeViewModel
+@{
+    ViewData["Title"] = "Upcoming events";
+}
+<section class="rd-hero mb-4">
+    <h1>Find your next start line</h1>
+    <p>Road runs, walks and cycle tours across South Africa.</p>
+</section>
+
+<form method="get" asp-action="Index" class="rd-card rd-filters mb-4">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <label for="city" class="form-label">City</label>
+            <input id="city" name="city" value="@Model.City" class="form-control" placeholder="e.g. Durban" />
+        </div>
+        <div class="col-md-3">
+            <label for="disciplineId" class="form-label">Event type</label>
+            <select id="disciplineId" name="disciplineId" class="form-select">
+                <option value="">All types</option>
+                @foreach (var d in Model.Disciplines)
+                {
+                    <option value="@d.DisciplineId" selected="@(Model.DisciplineId == d.DisciplineId)">@d.DisciplineName</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="fromDate" class="form-label">From date</label>
+            <input id="fromDate" name="fromDate" type="date" value="@Model.FromDate?.ToString("yyyy-MM-dd")" class="form-control" />
+        </div>
+        <div class="col-md-2 d-grid gap-2">
+            <button type="submit" class="btn btn-rd">Filter</button>
+            <a asp-action="Index" class="btn btn-link btn-sm">Clear</a>
+        </div>
+    </div>
+</form>
+
+@if (Model.Events.Count == 0)
+{
+    <div class="rd-card text-center py-5">
+        <p class="lead mb-0">No events match those filters yet. Try a different city or date.</p>
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var ev in Model.Events)
+        {
+            <div class="col-md-6 col-lg-4">
+                <a asp-action="Details" asp-route-id="@ev.EventId" class="event-card">
+                    <div class="event-banner" style="@(string.IsNullOrEmpty(ev.BannerImageUrl) ? "" : $"background-image:url('{ev.BannerImageUrl}')")">
+                        <span class="event-type">@Ui.DisciplineIcon(ev.DisciplineName) @ev.DisciplineName</span>
+                        <span class="event-date">
+                            <strong>@ev.EventDate.ToString("dd")</strong>
+                            @ev.EventDate.ToString("MMM").ToUpper()
+                        </span>
+                    </div>
+                    <div class="event-body">
+                        <h2>@ev.EventName</h2>
+                        <p class="mb-1">📍 @ev.VenueName, @ev.City</p>
+                        <p class="mb-2 text-muted small">@ev.EventDate.ToString("dddd, d MMMM yyyy") · Start @ev.StartTime.ToString("HH:mm")</p>
+                        <p class="distances mb-0">@Ui.Distances(ev.DistancesKm)</p>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+}

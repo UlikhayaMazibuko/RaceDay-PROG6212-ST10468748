@@ -1,14 +1,15 @@
-
-name: Part 2 API build and tests
+# Builds and tests the whole RaceDay system on every push and pull request:
+# the Part 2 API with its unit tests, and the Part 3 MVC web app with its Docker image.
+name: RaceDay build, tests and Docker
 
 on:
   push:
   pull_request:
 
 jobs:
-  build-and-test:
+  api-build-and-test:
+    name: Part 2 API build and unit tests
     runs-on: ubuntu-latest
-
     defaults:
       run:
         working-directory: Part2
@@ -30,3 +31,28 @@ jobs:
 
       - name: Run the unit tests
         run: dotnet test Part2.slnx --configuration Release --no-build --verbosity normal
+
+  mvc-build-and-docker:
+    name: Part 3 MVC build and Docker image
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Part3
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v5
+
+      - name: Install the .NET 10 SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore NuGet packages
+        run: dotnet restore Part3.slnx
+
+      - name: Build the MVC web app
+        run: dotnet build Part3.slnx --configuration Release --no-restore
+
+      - name: Build the Docker image
+        run: docker build -t raceday-web ./RaceDay.Web

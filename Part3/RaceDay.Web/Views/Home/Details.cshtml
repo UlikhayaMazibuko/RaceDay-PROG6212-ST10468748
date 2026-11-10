@@ -1,0 +1,123 @@
+@model EventDetailsViewModel
+@{
+    var ev = Model.Event;
+    ViewData["Title"] = ev.EventName;
+    var isParticipant = Context.Session.IsParticipant();
+    var loggedIn = Context.Session.IsLoggedIn();
+}
+<div class="detail-banner mb-4" style="@(string.IsNullOrEmpty(ev.BannerImageUrl) ? "" : $"background-image:url('{ev.BannerImageUrl}')")">
+    <div class="detail-banner-text">
+        <span class="event-type">@Ui.DisciplineIcon(ev.DisciplineName) @ev.DisciplineName</span>
+        <h1>@ev.EventName</h1>
+        <p class="mb-0">@ev.EventDate.ToString("dddd, d MMMM yyyy") · Start @ev.StartTime.ToString("HH:mm")</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-4 order-lg-2">
+        <div class="rd-card">
+            <h2 class="rd-subheading">Event info</h2>
+            <dl class="mb-0">
+                <dt>Venue</dt>
+                <dd>@ev.VenueName, @ev.City, @ev.Province</dd>
+                <dt>Entries close</dt>
+                <dd>@ev.RegistrationCloseDate.ToString("d MMMM yyyy")</dd>
+                <dt>Organiser</dt>
+                <dd>@ev.OrganiserName</dd>
+                <dt>Status</dt>
+                <dd class="mb-0"><span class="@Ui.BadgeClass(ev.Status)">@ev.Status</span></dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="col-lg-8 order-lg-1">
+        @if (!string.IsNullOrWhiteSpace(ev.Description))
+        {
+            <div class="rd-card mb-4">
+                <h2 class="rd-subheading">About this event</h2>
+                <p class="mb-0" style="white-space: pre-line">@ev.Description</p>
+            </div>
+        }
+
+        <div class="rd-card mb-4">
+            <h2 class="rd-subheading">Categories</h2>
+            @if (!Model.EntriesOpen)
+            {
+                <p class="text-muted">Entries for this event are closed.</p>
+            }
+            @if (Model.Categories.Count == 0)
+            {
+                <p class="mb-0">The organiser has not added any categories yet.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table rd-table align-middle mb-0">
+                        <thead>
+                            <tr><th>Category</th><th>Distance</th><th>Fee</th><th>Min age</th><th>Places left</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var c in Model.Categories)
+                            {
+                                var full = c.PlacesLeft is <= 0;
+                                <tr>
+                                    <td><strong>@c.CategoryName</strong>@if (c.CategoryStartTime is not null) {<div class="small text-muted">Starts @c.CategoryStartTime.Value.ToString("HH:mm")</div>}</td>
+                                    <td>@c.DistanceKm.ToString("0.##") km</td>
+                                    <td>@Ui.Rand(c.EntryFee)</td>
+                                    <td>@(c.MinimumAge > 0 ? $"{c.MinimumAge}+" : "Any")</td>
+                                    <td>@(c.PlacesLeft?.ToString() ?? "Unlimited")</td>
+                                    <td class="text-end">
+                                        @if (Model.MyCategoryIds.Contains(c.CategoryId))
+                                        {
+                                            <span class="badge-status badge-green">Entered</span>
+                                        }
+                                        else if (isParticipant && Model.EntriesOpen && !full)
+                                        {
+                                            <form asp-controller="Participant" asp-action="Enter" method="post" class="d-inline">
+                                                <input type="hidden" name="categoryId" value="@c.CategoryId" />
+                                                <input type="hidden" name="eventId" value="@ev.EventId" />
+                                                <button type="submit" class="btn btn-sm btn-rd">Enter event</button>
+                                            </form>
+                                        }
+                                        else if (full)
+                                        {
+                                            <span class="badge-status badge-red">Full</span>
+                                        }
+                                        else if (!loggedIn && Model.EntriesOpen)
+                                        {
+                                            <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path" class="btn btn-sm btn-outline-rd">Log in to enter</a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+        @if (Model.Results.Count > 0)
+        {
+            <div class="rd-card">
+                <h2 class="rd-subheading">Results</h2>
+                <div class="table-responsive">
+                    <table class="table rd-table align-middle mb-0">
+                        <thead><tr><th>Pos</th><th>Participant</th><th>Category</th><th>Time</th><th>Status</th></tr></thead>
+                        <tbody>
+                            @foreach (var r in Model.Results)
+                            {
+                                <tr>
+                                    <td>@(r.PositionOverall is int p ? Ui.Ordinal(p) : "-")</td>
+                                    <td>@r.ParticipantName</td>
+                                    <td>@r.CategoryName</td>
+                                    <td>@(r.FinishTime?.ToString("HH:mm:ss") ?? "-")</td>
+                                    <td><span class="@Ui.BadgeClass(r.ResultStatus)">@r.ResultStatus</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+</div>

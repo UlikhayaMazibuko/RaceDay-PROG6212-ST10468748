@@ -14,6 +14,7 @@ namespace RaceDay.Api.Dtos
         public string? City { get; set; }
         public string RoleName { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
+        public string? ProfilePictureUrl { get; set; }
     }
 
     public class UpdateProfileRequest

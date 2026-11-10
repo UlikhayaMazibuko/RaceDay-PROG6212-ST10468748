@@ -1,0 +1,53 @@
+@model List<RaceResult>
+@{
+    ViewData["Title"] = "My results";
+    var finished = Model.Where(r => r.ResultStatus == "Finished").ToList();
+}
+<h1 class="rd-heading mb-4">My results</h1>
+
+@if (Model.Count == 0)
+{
+    <div class="rd-card text-center py-5">
+        <p class="lead mb-0">No results yet. Results appear here once an organiser captures them after race day.</p>
+    </div>
+}
+else
+{
+    <div class="row g-3 mb-4">
+        <div class="col-sm-4"><div class="stat-tile"><span>@Model.Count</span>Races</div></div>
+        <div class="col-sm-4"><div class="stat-tile"><span>@finished.Count</span>Finishes</div></div>
+        <div class="col-sm-4"><div class="stat-tile"><span>@finished.Sum(r => r.DistanceKm).ToString("0.#")</span>km raced</div></div>
+    </div>
+
+    <div class="rd-card">
+        <div class="table-responsive">
+            <table class="table rd-table align-middle mb-0">
+                <thead>
+                    <tr><th>Event</th><th>Date</th><th>Category</th><th>Finish time</th><th>Position</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model)
+                    {
+                        <tr>
+                            <td><a asp-controller="Home" asp-action="Details" asp-route-id="@r.EventId"><strong>@r.EventName</strong></a></td>
+                            <td>@r.EventDate.ToString("d MMM yyyy")</td>
+                            <td>@r.CategoryName (@r.DistanceKm.ToString("0.##") km)</td>
+                            <td>@(r.FinishTime?.ToString("HH:mm:ss") ?? "-")</td>
+                            <td>
+                                @if (r.PositionOverall is int position)
+                                {
+                                    <strong>@Ui.Ordinal(position)</strong> <span class="text-muted">out of @r.TotalFinishers finishers</span>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                            <td><span class="@Ui.BadgeClass(r.ResultStatus)">@r.ResultStatus</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

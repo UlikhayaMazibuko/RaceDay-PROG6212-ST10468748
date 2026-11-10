@@ -111,7 +111,8 @@ namespace RaceDay.Api.Controllers
                 Gender = user.Gender,
                 City = user.City,
                 RoleName = user.Role?.RoleName ?? string.Empty,
-                CreatedAt = user.CreatedAt
+                CreatedAt = user.CreatedAt,
+                ProfilePictureUrl = user.ProfilePictureUrl
             };
         }
     }

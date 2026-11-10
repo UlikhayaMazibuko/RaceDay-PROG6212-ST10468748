@@ -1,7 +1,8 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RaceDay.Api.Data;
 using RaceDay.Api.Models;
+using RaceDay.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,10 @@ builder.Services.AddDbContext<RaceDayDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("RaceDayDb")));
 
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
+// Event banners and profile pictures are stored in Azure Blob Storage. The connection string
+// is kept in User Secrets (never in appsettings.json), under AzureStorage:ConnectionString.
+builder.Services.AddSingleton<IImageStorage, BlobImageStorage>();
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -45,7 +50,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// HTTPS redirection is skipped while developing so the MVC app running in Docker can call the
+// API over http://host.docker.internal:5106 without needing the development certificate.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseSession();
 

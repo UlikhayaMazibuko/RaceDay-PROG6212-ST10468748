@@ -69,6 +69,7 @@ namespace RaceDay.Api.Controllers
                     Longitude = e.Longitude,
                     RegistrationCloseDate = e.RegistrationCloseDate,
                     Status = e.Status,
+                    BannerImageUrl = e.BannerImageUrl,
                     OrganiserId = e.OrganiserId,
                     OrganiserName = e.Organiser!.FirstName + " " + e.Organiser.LastName,
                     Categories = e.Categories
@@ -253,6 +254,7 @@ namespace RaceDay.Api.Controllers
                 City = e.City,
                 Province = e.Province,
                 Status = e.Status,
+                BannerImageUrl = e.BannerImageUrl,
                 DistancesKm = e.Categories.OrderByDescending(c => c.DistanceKm).Select(c => c.DistanceKm).ToList(),
                 EnrolmentCount = e.Categories.SelectMany(c => c.Enrolments).Count()
             });

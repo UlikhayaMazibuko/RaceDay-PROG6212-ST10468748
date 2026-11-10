@@ -1,0 +1,74 @@
+@model ResultsEntryViewModel
+@{
+    ViewData["Title"] = $"Results: {Model.Event.EventName}";
+}
+<p class="mb-1"><a asp-action="Dashboard">&larr; Dashboard</a></p>
+<h1 class="rd-heading mb-1">Results entry</h1>
+<p class="text-muted mb-4">@Model.Event.EventName · @Model.Event.EventDate.ToString("d MMMM yyyy")</p>
+
+@if (!Model.EventHasHappened)
+{
+    <div class="alert alert-warning">Results can be captured once the event has taken place on @Model.Event.EventDate.ToString("d MMMM yyyy").</div>
+}
+
+@if (Model.Enrolments.Count == 0)
+{
+    <div class="rd-card text-center py-5"><p class="lead mb-0">There are no enrolments to capture results for.</p></div>
+}
+else
+{
+    <div class="rd-card">
+        <div class="table-responsive">
+            <table class="table rd-table align-middle mb-0">
+                <thead><tr><th>Race no.</th><th>Participant</th><th>Category</th><th>Result</th></tr></thead>
+                <tbody>
+                    @foreach (var en in Model.Enrolments.OrderBy(e => e.RaceNumber))
+                    {
+                        <tr>
+                            <td><span class="race-number">@en.RaceNumber</span></td>
+                            <td><strong>@en.ParticipantName</strong></td>
+                            <td>@en.CategoryName</td>
+                            <td>
+                                @if (Model.ResultsByEnrolment.TryGetValue(en.EnrolmentId, out var r))
+                                {
+                                    <span class="@Ui.BadgeClass(r.ResultStatus)">@r.ResultStatus</span>
+                                    @if (r.FinishTime is not null)
+                                    {
+                                        <span class="ms-2">@r.FinishTime.Value.ToString("HH:mm:ss")</span>
+                                    }
+                                    @if (r.PositionOverall is int pos)
+                                    {
+                                        <span class="ms-2 text-muted">@Ui.Ordinal(pos) overall@(r.PositionInCategory is int cp ? $", {Ui.Ordinal(cp)} in category" : "")</span>
+                                    }
+                                }
+                                else if (Model.EventHasHappened)
+                                {
+                                    <form asp-action="CaptureResult" asp-route-id="@Model.Event.EventId" method="post" class="row g-2 align-items-center">
+                                        <input type="hidden" name="enrolmentId" value="@en.EnrolmentId" />
+                                        <div class="col-auto">
+                                            <select name="resultStatus" class="form-select form-select-sm">
+                                                <option>Finished</option>
+                                                <option>DNF</option>
+                                                <option>DNS</option>
+                                                <option>DQ</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-auto"><input name="finishTime" type="time" step="1" class="form-control form-control-sm" title="Finish time (hh:mm:ss)" /></div>
+                                        <div class="col-auto"><input name="positionOverall" type="number" min="1" class="form-control form-control-sm" placeholder="Overall pos" style="width:7rem" /></div>
+                                        <div class="col-auto"><input name="positionInCategory" type="number" min="1" class="form-control form-control-sm" placeholder="Category pos" style="width:7rem" /></div>
+                                        <div class="col-auto"><button type="submit" class="btn btn-sm btn-rd">Save</button></div>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Not yet</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <p class="small text-muted mt-3 mb-0">For DNF, DNS or DQ leave the time and positions empty.</p>
+    </div>
+}

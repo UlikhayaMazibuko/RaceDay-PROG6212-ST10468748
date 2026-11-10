@@ -1,0 +1,46 @@
+@model EnrolmentsViewModel
+@{
+    ViewData["Title"] = $"Enrolments: {Model.Event.EventName}";
+}
+<p class="mb-1"><a asp-action="Dashboard">&larr; Dashboard</a></p>
+<h1 class="rd-heading mb-1">Enrolments</h1>
+<p class="text-muted mb-4">@Model.Event.EventName · @Model.Event.EventDate.ToString("d MMMM yyyy") · @Model.Enrolments.Count entered</p>
+
+@if (Model.Enrolments.Count == 0)
+{
+    <div class="rd-card text-center py-5"><p class="lead mb-0">Nobody has entered this event yet.</p></div>
+}
+else
+{
+    <div class="rd-card">
+        <div class="table-responsive">
+            <table class="table rd-table align-middle mb-0">
+                <thead><tr><th>Race number</th><th>Participant</th><th>Category</th><th>Entered on</th><th>Status</th><th>Change status</th></tr></thead>
+                <tbody>
+                    @foreach (var en in Model.Enrolments.OrderBy(e => e.RaceNumber))
+                    {
+                        <tr>
+                            <td><span class="race-number">@en.RaceNumber</span></td>
+                            <td><strong>@en.ParticipantName</strong></td>
+                            <td>@en.CategoryName</td>
+                            <td>@en.EnrolmentDate.ToLocalTime().ToString("d MMM yyyy")</td>
+                            <td><span class="@Ui.BadgeClass(en.EnrolmentStatus)">@en.EnrolmentStatus</span></td>
+                            <td>
+                                <form asp-action="UpdateEnrolmentStatus" asp-route-id="@Model.Event.EventId" method="post" class="d-flex gap-2">
+                                    <input type="hidden" name="enrolmentId" value="@en.EnrolmentId" />
+                                    <select name="status" class="form-select form-select-sm w-auto">
+                                        @foreach (var s in new[] { "Pending", "Confirmed", "Cancelled" })
+                                        {
+                                            <option selected="@(s == en.EnrolmentStatus)">@s</option>
+                                        }
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary">Save</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

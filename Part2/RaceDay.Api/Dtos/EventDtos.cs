@@ -21,6 +21,7 @@ namespace RaceDay.Api.Dtos
         public string Status { get; set; } = string.Empty;
         public List<decimal> DistancesKm { get; set; } = new();
         public int EnrolmentCount { get; set; }
+        public string? BannerImageUrl { get; set; }
     }
 
     public class EventCategoryInfo
@@ -49,6 +50,7 @@ namespace RaceDay.Api.Dtos
         public string Status { get; set; } = string.Empty;
         public int OrganiserId { get; set; }
         public string OrganiserName { get; set; } = string.Empty;
+        public string? BannerImageUrl { get; set; }
         public List<EventCategoryInfo> Categories { get; set; } = new();
     }
 

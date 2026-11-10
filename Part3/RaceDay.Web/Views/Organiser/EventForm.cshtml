@@ -1,0 +1,133 @@
+@model EventFormViewModel
+@{
+    var isEdit = Model.EventId.HasValue;
+    ViewData["Title"] = isEdit ? "Edit event" : "New event";
+}
+<h1 class="rd-heading mb-4">@ViewData["Title"]</h1>
+
+<form asp-action="@(isEdit ? "EditEvent" : "CreateEvent")" asp-route-id="@Model.EventId" method="post" enctype="multipart/form-data" novalidate>
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2"></div>
+    <input type="hidden" asp-for="CurrentBannerUrl" />
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="rd-card">
+                <h2 class="rd-subheading">Event details</h2>
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label asp-for="EventName" class="form-label"></label>
+                        <input asp-for="EventName" class="form-control" placeholder="e.g. Newcastle Winter 10K" />
+                        <span asp-validation-for="EventName" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="DisciplineId" class="form-label"></label>
+                        <select asp-for="DisciplineId" class="form-select">
+                            <option value="">Choose...</option>
+                            @foreach (var d in Model.Disciplines)
+                            {
+                                <option value="@d.DisciplineId">@d.DisciplineName</option>
+                            }
+                        </select>
+                        <span asp-validation-for="DisciplineId" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Description" class="form-label"></label>
+                        <textarea asp-for="Description" rows="4" class="form-control" placeholder="Route, parking, goodie bags, anything runners should know"></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="EventDate" class="form-label"></label>
+                        <input asp-for="EventDate" type="date" class="form-control" />
+                        <span asp-validation-for="EventDate" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="StartTime" class="form-label"></label>
+                        <input asp-for="StartTime" type="time" class="form-control" />
+                        <span asp-validation-for="StartTime" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="RegistrationCloseDate" class="form-label"></label>
+                        <input asp-for="RegistrationCloseDate" type="date" class="form-control" />
+                        <span asp-validation-for="RegistrationCloseDate" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <h2 class="rd-subheading mt-4">Location</h2>
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <label asp-for="VenueName" class="form-label"></label>
+                        <input asp-for="VenueName" class="form-control" placeholder="e.g. Arbor Park Sports Ground" />
+                        <span asp-validation-for="VenueName" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="City" class="form-label"></label>
+                        <input asp-for="City" class="form-control" />
+                        <span asp-validation-for="City" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Province" class="form-label"></label>
+                        <select asp-for="Province" class="form-select">
+                            <option value="">Choose...</option>
+                            @foreach (var p in Ui.Provinces)
+                            {
+                                <option>@p</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Province" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                @if (!isEdit)
+                {
+                    <h2 class="rd-subheading mt-4">Distance</h2>
+                    <p class="text-muted small">Each event can offer several distances. Add the first one here, and more on the Categories page afterwards.</p>
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <label asp-for="FirstCategoryName" class="form-label"></label>
+                            <input asp-for="FirstCategoryName" class="form-control" placeholder="e.g. 10 km Road Race" />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="DistanceKm" class="form-label"></label>
+                            <input asp-for="DistanceKm" type="number" step="0.1" min="0.1" class="form-control" />
+                            <span asp-validation-for="DistanceKm" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-3">
+                            <label asp-for="EntryFee" class="form-label"></label>
+                            <input asp-for="EntryFee" type="number" step="0.01" min="0" class="form-control" />
+                            <span asp-validation-for="EntryFee" class="text-danger small"></span>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <h2 class="rd-subheading mt-4">Status</h2>
+                    <select asp-for="Status" class="form-select w-auto">
+                        <option>Draft</option>
+                        <option>Published</option>
+                        <option>Completed</option>
+                        <option>Cancelled</option>
+                    </select>
+                    <p class="small text-muted mt-2">Distances are managed on the <a asp-action="Categories" asp-route-id="@Model.EventId">Categories</a> page.</p>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="rd-card">
+                <h2 class="rd-subheading">Banner image</h2>
+                @if (!string.IsNullOrEmpty(Model.CurrentBannerUrl))
+                {
+                    <img src="@Model.CurrentBannerUrl" alt="Current banner" class="img-fluid rounded mb-3" />
+                }
+                <input asp-for="Banner" type="file" accept="image/png,image/jpeg,image/webp,image/gif" class="form-control" />
+                <div class="form-text">JPG, PNG, WEBP or GIF, up to 5 MB. Stored in Azure Blob Storage.</div>
+                <span asp-validation-for="Banner" class="text-danger small"></span>
+            </div>
+
+            <div class="d-grid gap-2 mt-4">
+                <button type="submit" class="btn btn-rd btn-lg">@(isEdit ? "Save changes" : "Create event")</button>
+                <a asp-action="Dashboard" class="btn btn-link">Cancel</a>
+            </div>
+        </div>
+    </div>
+</form>

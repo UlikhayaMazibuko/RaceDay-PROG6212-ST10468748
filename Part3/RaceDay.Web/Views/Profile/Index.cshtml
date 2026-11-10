@@ -1,0 +1,78 @@
+@model ProfileViewModel
+@{
+    ViewData["Title"] = "My profile";
+    var initials = $"{(Model.FirstName.Length > 0 ? Model.FirstName[0] : ' ')}{(Model.LastName.Length > 0 ? Model.LastName[0] : ' ')}";
+}
+<h1 class="rd-heading mb-4">My profile</h1>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="rd-card text-center">
+            @if (!string.IsNullOrEmpty(Model.ProfilePictureUrl))
+            {
+                <img src="@Model.ProfilePictureUrl" alt="Profile picture" class="profile-picture mb-3" />
+            }
+            else
+            {
+                <div class="profile-picture profile-initials mb-3">@initials</div>
+            }
+            <h2 class="rd-subheading mb-1">@Model.FirstName @Model.LastName</h2>
+            <p class="mb-1"><span class="role-pill role-pill-dark">@Model.RoleName</span></p>
+            <p class="text-muted small mb-3">@Model.Email</p>
+
+            <form asp-action="UploadPicture" method="post" enctype="multipart/form-data">
+                <input type="file" name="picture" accept="image/png,image/jpeg,image/webp,image/gif" class="form-control form-control-sm mb-2" />
+                <button type="submit" class="btn btn-sm btn-outline-rd w-100">Upload picture</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="rd-card">
+            <h2 class="rd-subheading">Personal details</h2>
+            <form asp-action="Index" method="post" novalidate>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2"></div>
+                <input type="hidden" asp-for="Email" />
+                <input type="hidden" asp-for="RoleName" />
+                <input type="hidden" asp-for="DateOfBirth" />
+                <input type="hidden" asp-for="ProfilePictureUrl" />
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="FirstName" class="form-label"></label>
+                        <input asp-for="FirstName" class="form-control" />
+                        <span asp-validation-for="FirstName" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="LastName" class="form-label"></label>
+                        <input asp-for="LastName" class="form-control" />
+                        <span asp-validation-for="LastName" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="PhoneNumber" class="form-label"></label>
+                        <input asp-for="PhoneNumber" class="form-control" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="City" class="form-label"></label>
+                        <input asp-for="City" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Gender" class="form-label"></label>
+                        <select asp-for="Gender" class="form-select">
+                            <option value="">Prefer not to say</option>
+                            <option>Female</option>
+                            <option>Male</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Date of birth</label>
+                        <input class="form-control" value="@Model.DateOfBirth.ToString("d MMMM yyyy")" disabled />
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-rd mt-4">Save changes</button>
+            </form>
+        </div>
+    </div>
+</div>

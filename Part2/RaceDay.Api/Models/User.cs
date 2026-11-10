@@ -22,6 +22,9 @@
 
         public string? City { get; set; }
 
+        // Public Azure Blob Storage URL of the profile picture. Null until one is uploaded.
+        public string? ProfilePictureUrl { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
         public bool IsActive { get; set; } = true;
